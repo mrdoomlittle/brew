@@ -21,6 +21,16 @@ void static sk_white_space() {
 bucketp static buf[BUFSIZE];
 bucketp static* end = buf;
 
+mdl_u8_t tokbuf_size() {
+	return end-buf;
+}
+
+bucketp peek_token() {
+	bucketp p;
+	ulex(p = lex());
+	return p;
+}
+
 void ulex(bucketp __p) {
 	if (end >= buf+BUFSIZE) {
 		fprintf(stderr, "lexer buffer full.\n");
@@ -28,6 +38,11 @@ void ulex(bucketp __p) {
 	}
 
 	*(end++) = __p;
+}
+
+mdl_u8_t expect_token(mdl_u8_t __sort, mdl_u8_t __val) {
+	bucketp tok = lex();
+	return (tok->sort == __sort && tok->val == __val);
 }
 
 char* read_ident(mdl_u16_t *__len) {
@@ -48,7 +63,7 @@ char* read_ident(mdl_u16_t *__len) {
 /*
 	tokens will be freed from head down if overflow	
 */
-# define BACK 4
+# define BACK 6
 bucketp static head = NULL;
 bucketp static next = NULL;
 mdl_uint_t static len = 0;
@@ -80,11 +95,11 @@ bucketp lex() {
 	} else if (is_ident(c)) {
 		ret->sort = _ident;
 		ret->p = read_ident(&ret->len);
-		p+=ret->len;
 	} else {
 		switch(c) {
 			case ':':
-				ret->sort = _colon;
+				ret->sort = _chr;
+				ret->val = _colon;
 				incrp;
 			break;
 			default:

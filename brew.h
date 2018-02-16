@@ -6,17 +6,24 @@ extern mdl_u8_t *p;
 # define decrp p--
 typedef struct bucket {
 	struct bucket *next;
-	mdl_u8_t sort;
+	mdl_u8_t sort, val;
 	void *p;
 	mdl_u16_t len;
 } *bucketp;
 
 enum {
-	_unknown,
-	_ident,
 	_colon
 };
 
+enum {
+	_unknown,
+	_ident,
+	_chr
+};
+
+mdl_u8_t tokbuf_size();
+mdl_u8_t expect_token(mdl_u8_t, mdl_u8_t);
+bucketp peek_token();
 bucketp lex();
 void ulex(bucketp);
 void parse(bucketp*);
